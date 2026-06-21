@@ -1,0 +1,16 @@
+# Local / self-hosted deploy — `docker compose up --build` and open http://localhost:8501.
+# Tor is bundled inside the image, so nothing needs to be installed on the host.
+# Create a .env first (copy .env.example) to pass LLM API keys.
+services:
+  robin:
+    build: .
+    image: robin:latest
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./investigations:/app/investigations
+    restart: unless-stopped

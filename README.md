@@ -85,6 +85,71 @@ streamlit run ui.py
 
 - Open your browser and navigate to `http://localhost:8501`
 
+### Self-hosted with Docker Compose
+
+The image bundles Tor, so nothing needs to be installed on the host beyond Docker.
+
+```bash
+cp .env.example .env   # add your LLM API keys
+docker compose up --build
+```
+
+Open `http://localhost:8501`. Investigations persist in the `investigations/` folder.
+
+---
+
+## Cloud Deployment (no local install)
+
+Robin ships as a single self-contained image (Tor + Streamlit), so it can run on any
+container host and be reached through a public URL — nothing to install on your machine.
+The container reads the platform-provided `$PORT` (falling back to `8501` locally) and
+binds to `0.0.0.0`. Add your LLM API keys as environment variables / secrets on the
+platform, or use the **🔌 Custom API Provider** expander in the sidebar at runtime.
+
+### Render [one-click]
+
+The repo includes a [`render.yaml`](render.yaml) Blueprint.
+
+1. Fork/push this repo to GitHub.
+2. On [Render](https://render.com), choose **New + → Blueprint** and select the repo.
+3. Render builds the Docker image and serves the app at `https://<name>.onrender.com`.
+4. Add your LLM API keys under the service's **Environment** tab.
+
+> [!NOTE]
+> The free instance type sleeps after inactivity; the first request (and Tor bootstrap)
+> may take ~30–60s to wake up.
+
+### Fly.io
+
+The repo includes a [`fly.toml`](fly.toml).
+
+```bash
+fly auth login
+fly launch --copy-config --no-deploy   # pick a unique app name
+fly secrets set OPENAI_API_KEY=... ANTHROPIC_API_KEY=...
+fly deploy
+```
+
+The app is served at `https://<app-name>.fly.dev`.
+
+### Google Cloud Run
+
+```bash
+gcloud run deploy robin \
+  --source . \
+  --port 8080 \
+  --allow-unauthenticated \
+  --memory 1Gi \
+  --set-env-vars OPENAI_API_KEY=...
+```
+
+Cloud Run injects `$PORT=8080`, which the entrypoint honours. The returned
+`https://robin-xxxxx.run.app` URL is your public app.
+
+> [!NOTE]
+> Cloud Run scales to zero; cold starts pay the Tor bootstrap latency. Use
+> `--min-instances 1` to keep an instance warm.
+
 ---
 
 ## Contributing

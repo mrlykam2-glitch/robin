@@ -1,0 +1,12 @@
+.git
+.gitignore
+.github/assets/demo.gif
+__pycache__/
+*.pyc
+.env
+.venv
+venv/
+investigations/
+screenshots/
+*.md
+!prompt.md

@@ -1,0 +1,33 @@
+# Render Blueprint — one-click cloud deploy for Robin.
+# Deploy: push this repo to GitHub, then on https://render.com pick
+# "New +" > "Blueprint" and select your fork. Render builds the Docker
+# image (Tor bundled) and serves the app at a public HTTPS URL.
+# Render injects $PORT automatically; entrypoint.sh honours it.
+services:
+  - type: web
+    name: robin
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /_stcore/health
+    autoDeploy: false
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: LLAMA_CPP_BASE_URL
+        sync: false
+      - key: CUSTOM_API_BASE_URL
+        sync: false
+      - key: CUSTOM_API_KEY
+        sync: false
+      - key: CUSTOM_API_MODEL
+        sync: false
